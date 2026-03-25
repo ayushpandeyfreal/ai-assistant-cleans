@@ -6,11 +6,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.use(
-  cors({
-    origin: "https://ai-assistant-cleans.vercel.app/"
-  })
-);
+
+// ✅ Simple & safe CORS (no error)
+app.use(cors());
+
 app.use(express.json());
 
 app.post("/chat", async (req, res) => {
@@ -33,9 +32,13 @@ app.post("/chat", async (req, res) => {
 
     res.json(response.data.choices[0].message);
   } catch (err) {
-    console.error(err.message);
+    console.error("ERROR:", err.message);
     res.status(500).json({ error: "Something went wrong" });
   }
+});
+
+app.get("/", (req, res) => {
+  res.send("AI Backend is Running 🚀");
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));

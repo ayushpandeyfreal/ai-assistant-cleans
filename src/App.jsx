@@ -87,7 +87,7 @@ function App() {
     navigator.clipboard.writeText(text);
   };
 
-  const API_URL = "https://ai-assistant-backends.onrender.com/chat";
+  const API_URL = "https://ai-assistant-backend.onrender.com/chat";
 
   const sendMessage = async () => {
     if (!input.trim()) return;
