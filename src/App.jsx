@@ -157,7 +157,7 @@ function App() {
     <div style={styles.container}>
       <h1 style={styles.heading}>AI Assistant</h1>
 
-      {/* Chat Box */}
+      
       <div style={styles.chatBox}>
         {messages.map((msg, index) => (
           <div
