@@ -6,7 +6,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://ai-assistant-cleans.vercel.app/"
+  })
+);
 app.use(express.json());
 
 app.post("/chat", async (req, res) => {

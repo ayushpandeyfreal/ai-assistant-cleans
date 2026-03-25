@@ -11,44 +11,6 @@ function App() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleFeature = async (type) => {
-  if (!input.trim()) return;
-
-  let prompt = "";
-
-  if (type === "summarize") {
-    prompt = "Summarize this: " + input;
-  } else if (type === "grammar") {
-    prompt = "Fix grammar: " + input;
-  } else if (type === "linkedin") {
-    prompt = "Write a professional LinkedIn post about: " + input;
-  }
-
-  const newMessage = { role: "user", content: prompt };
-  const updatedMessages = [...messages, newMessage];
-
-  setMessages(updatedMessages);
-  setInput("");
-  setLoading(true);
-
-  try {
-    const res = await axios.post("https://ai-assistant-backends.onrender.com/chat", {
-      messages: updatedMessages,
-    });
-
-    const aiMessage = {
-      role: "assistant",
-      content: res.data.content,
-    };
-
-    setMessages((prev) => [...prev, aiMessage]);
-  } catch (error) {
-    console.log(error);
-  }
-
-  setLoading(false);
-};
-
   const styles = {
     container: {
       height: "100vh",
@@ -111,19 +73,21 @@ function App() {
       color: "#ccc",
     },
     featureBtn: {
-  marginRight: "10px",
-  padding: "8px 12px",
-  borderRadius: "8px",
-  border: "none",
-  cursor: "pointer",
-  backgroundColor: "#333",
-  color: "white"
-}
+      marginRight: "10px",
+      padding: "8px 12px",
+      borderRadius: "8px",
+      border: "none",
+      cursor: "pointer",
+      backgroundColor: "#333",
+      color: "white",
+    },
   };
 
   const copyText = (text) => {
     navigator.clipboard.writeText(text);
   };
+
+  const API_URL = "https://ai-assistant-backend.onrender.com/chat";
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -136,7 +100,45 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/chat", {
+      const res = await axios.post(API_URL, {
+        messages: updatedMessages,
+      });
+
+      const aiMessage = {
+        role: "assistant",
+        content: res.data.content,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setLoading(false);
+  };
+
+  const handleFeature = async (type) => {
+    if (!input.trim()) return;
+
+    let prompt = "";
+
+    if (type === "summarize") {
+      prompt = "Summarize this: " + input;
+    } else if (type === "grammar") {
+      prompt = "Fix grammar: " + input;
+    } else if (type === "linkedin") {
+      prompt = "Write a professional LinkedIn post about: " + input;
+    }
+
+    const newMessage = { role: "user", content: prompt };
+    const updatedMessages = [...messages, newMessage];
+
+    setMessages(updatedMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const res = await axios.post(API_URL, {
         messages: updatedMessages,
       });
 
@@ -157,8 +159,27 @@ function App() {
     <div style={styles.container}>
       <h1 style={styles.heading}>AI Assistant</h1>
 
-      
+      {/* Feature Buttons */}
+      <div style={{ marginBottom: "10px" }}>
+        <button style={styles.featureBtn} onClick={() => handleFeature("summarize")}>
+          Summarize
+        </button>
+
+        <button style={styles.featureBtn} onClick={() => handleFeature("grammar")}>
+          Fix Grammar
+        </button>
+
+        <button style={styles.featureBtn} onClick={() => handleFeature("linkedin")}>
+          LinkedIn Post
+        </button>
+      </div>
+
+      {/* Chat Box */}
       <div style={styles.chatBox}>
+        {messages.length === 0 && (
+          <p style={{ color: "gray" }}>Start chatting with AI...</p>
+        )}
+
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -198,20 +219,7 @@ function App() {
         <div ref={chatEndRef} />
       </div>
 
-    <div style={{ marginBottom: "10px" }}>
-  <button style={styles.featureBtn} onClick={() => handleFeature("summarize")}>
-    Summarize
-  </button>
-
-  <button style={styles.featureBtn} onClick={() => handleFeature("grammar")}>
-    Fix Grammar
-  </button>
-
-  <button style={styles.featureBtn} onClick={() => handleFeature("linkedin")}>
-    LinkedIn Post
-  </button>
-</div>
-
+      {/* Input */}
       <div style={styles.inputContainer}>
         <input
           value={input}
@@ -221,7 +229,7 @@ function App() {
           style={styles.input}
         />
 
-        <button onClick={sendMessage} style={styles.button}>
+        <button onClick={sendMessage} style={styles.button} disabled={loading}>
           Send
         </button>
       </div>
